@@ -92,6 +92,7 @@ if not st.session_state.generated:
             if txt:
                 st.session_state.generate_button_disabled = False
                 st.session_state.text_inputted = True
+                st.session_state.file_uploaded = False
                 
     if st.button(
         "Generate Tech Spec", 
