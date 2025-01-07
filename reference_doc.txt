@@ -1,2 +1,2 @@
 reference document
-An app that uses AI to filter out the sound of motorcycles in heavy traffic
+network flunctuation predictions/regression in a schools MAN

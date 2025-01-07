@@ -8,6 +8,7 @@ from tempfile import NamedTemporaryFile
 from pathlib import Path
 from identt import client
 from dotenv import load_dotenv
+from datetime import datetime
 
 load_dotenv()
 
@@ -34,7 +35,7 @@ SYSTEM_PROMPT = f"""You are a helpful assistant that is expert in generate Techn
 
 
 model_id = client.get_model_id_by_name(name="SpecGPT")
-index_uuid = client.get_index_uuid_by_name(name="specgpt_final")
+# index_uuid = client.get_index_uuid_by_name(name="specgpt_final")
 
 
 #streamlit code
@@ -66,7 +67,7 @@ st.divider()
 if not st.session_state.generated:
     if not st.session_state.generating:
         if not st.session_state.text_inputted:
-            uploaded_file = st.file_uploader("Upload a reference file")
+            uploaded_file = st.file_uploader("Upload a description file")
             if uploaded_file is not None:
                 st.session_state.file_uploaded = True
                 st.session_state.generate_button_disabled = False
@@ -88,7 +89,7 @@ if not st.session_state.generated:
             col2.write("OR")
         
         if not st.session_state.file_uploaded:
-            txt = st.text_area("Write a detailed description of the product")
+            txt = st.text_area("Write a detailed description of the product (ctrl/cmd + enter when done)")
             if txt:
                 st.session_state.generate_button_disabled = False
                 st.session_state.text_inputted = True
@@ -121,12 +122,16 @@ if not st.session_state.generated:
 
         with st.spinner("Generating Technical Specification Document..."):
             try:
-                index = client.index_files(file_objects=file_objects, index_uuid=index_uuid)
+                now = datetime.now().strftime("%Y%m%d%H%M%S")
+                # index = client.index_files(file_objects=file_objects, index_uuid=index_uuid)
+                index_name = f"specgpt_{now}"
+                index = client.index_files(file_objects=file_objects, name=index_name)
+                index_uuid = client.get_index_uuid_by_name(name=index_name)
                 
                 response = client.chat(
                     model_id=model_id,
                     index_uuid=index_uuid,
-                    query=f"""write the detailed and extensive technical specification for the reference doc, make sure to use all the information at your disposal. follow the following structure:
+                    query=f"""write the detailed and extensive technical specification for the reference doc, make sure to use all the information in the reference doc. follow the following structure, but make it really really comprehensive. add subsections as you see fit.:
                 Structure/format:
                                 - **Title**  
                                 - **Summary**  
